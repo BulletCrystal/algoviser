@@ -1,22 +1,22 @@
 // Global Variablres
 
-const WinWidth = window.outerWidth;
-const WinHeight = window.outerHeight;
+const WinWidth = window.innerWidth;
+const WinHeight = window.innerHeight;
 const BoxSize = 30;
 const Time_step = 100;//time for each frame in (ms)
 
-const grid_width = (WinWidth / BoxSize)-1;
+const grid_width = (WinWidth / BoxSize) -2;
 const grid_height = (WinHeight / BoxSize)/1.3;
 
 const grid_div = document.querySelector('.grid');
 let [Rand_start_x,Rand_start_y,Rand_end_x,Rand_end_y] = start_end_cell(); 
 
 function start_end_cell(){
-    let Rand_start_x = Math.floor(Math.random()*(grid_width));
-    let Rand_start_y = Math.floor(Math.random()*(grid_height));
-    let Rand_end_x = Math.floor(Math.random()*(grid_width));
-    let Rand_end_y = Math.floor(Math.random()*(grid_height));
-
+    let Rand_start_x = Math.floor(Math.random()*(grid_width - 2)) + 1;
+    let Rand_start_y = Math.floor(Math.random()*(grid_height - 2)) + 1;
+    let Rand_end_x = Math.floor(Math.random()*(grid_width - 2)) + 1;
+    let Rand_end_y = Math.floor(Math.random()*(grid_height - 2)) + 1;
+     
 
     return [Rand_start_x,Rand_start_y,Rand_end_x,Rand_end_y]
 
@@ -28,17 +28,16 @@ function create_grid() {
     
 
     for (let y = 0; y < grid_height; y++) {
-        for (let x = 0; x < grid_width; x++) {
+        for (let x = 2; x < grid_width; x++) {
             let child = document.createElement('div');
-            if(x == Rand_end_x && y == Rand_end_y){
+            if(x == 2 || x >= grid_width - 1 || y == 0 || y >= grid_height - 1){
+                child.classList.add('wall_cell');
+            }else if(x == Rand_end_x && y == Rand_end_y){
                 child.classList.add('end_cell');
                 child.style.backgroundImage = "url('./icons/end.png')";
                 child.style.backgroundRepeat = 'no-repeat';
                 child.style.backgroundSize = '100% 100%';
-            }else if(x == 0 || x == grid_width - 1 || y == 0 || y >= grid_height - 1){
-                child.classList.add('wall_cell');
-            }
-            else if(x == Rand_start_x && y == Rand_start_y){
+            }else if(x == Rand_start_x && y == Rand_start_y){
                 child.classList.add('start_cell');
                 child.classList.remove('route_cell');
                 child.style.backgroundImage = "url('./icons/start.png')";
@@ -60,6 +59,7 @@ function create_grid() {
         }
     }
 
+    
     grid_div.appendChild(fragment);
     
 }
@@ -69,22 +69,32 @@ function handle_walls(){
     // for adding walls (we need to check first if the mouse event has already been triggerd)
     // mouse
     let mouse_active = false;
+    let mouse_active_remove = false;
     if(mouse_active === false){
         document.addEventListener('mousedown',(event)=>{
             mouse_active = true;
             if (event.target.classList.contains('empty_cell')){
                 event.target.classList.add('wall_cell');
                 event.target.classList.remove('empty_cell');
+                mouse_active_remove = false;
+            }else if(event.target.classList.contains('wall_cell')){
+                event.target.classList.remove('wall_cell');
+                event.target.classList.add('empty_cell');
+                mouse_active_remove = true;
             }
         })
         document.addEventListener('mouseup',()=>{
             mouse_active = false;
+            mouse_active_remove = false;
         })
     }
     document.addEventListener('mouseover',(event)=>{
-        if(mouse_active && event.target.classList.contains('empty_cell')) {
+        if(mouse_active && event.target.classList.contains('empty_cell') && !mouse_active_remove) {
             event.target.classList.add('wall_cell');
             event.target.classList.remove('empty_cell');
+        }else if(mouse_active_remove && event.target.classList.contains('wall_cell')){
+            event.target.classList.add('empty_cell');
+            event.target.classList.remove('wall_cell');
         }
     })
 
@@ -174,10 +184,9 @@ function start_algorithm(){
                 }
                 
             }
-            if (collision === 8) {
-                head_grid_x--;
-                head_grid_y--;
-            }
+        }else if (collision === 8) {
+            collision = 0;
+
         }
     }
     

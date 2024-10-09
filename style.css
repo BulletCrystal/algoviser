@@ -42,7 +42,7 @@ body{
     width: 100%;
     background-color: green;
     box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-    z-index: 1;
+    z-index: 2;
     padding: 10px 0px;
 }
 
@@ -90,9 +90,7 @@ for the grid  and empty cells
 */
 .grid{
     position: relative;
-    margin: 0px 15px;
     user-select: none;
-    
 }
 .empty_cell{
     background-color: white;
@@ -105,7 +103,21 @@ for the grid  and empty cells
 
 /* for the active cell */
 .wall_cell{
+    transition: background-color 0.2s;
+    z-index: 1;
     background-color: brown;
+    animation: anim 0.3s ;
+}
+@keyframes anim {
+    0%{
+        scale: 1;
+    }
+    50%{
+        scale: 1.4;
+    }
+    100%{
+        scale: 1;
+    }
 }
 
 /* for the route cells */
@@ -113,11 +125,13 @@ for the grid  and empty cells
     transition: background-color 0.3s ease-in-out,scale 0.3s ease-in-out;
     scale: 0.4;
     background-color: rgb(100,250,100);
+
 }
 
 .next_cell{
     background-color: rgb(0, 0, 0);
     scale: 0.8;
+
 }
 /* 
 for the start and end cells
