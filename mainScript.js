@@ -5,8 +5,8 @@ const WinHeight = window.innerHeight;
 const BoxSize = 30;
 const Time_step = 100;//time for each frame in (ms)
 
-const grid_width = (WinWidth / BoxSize) -2;
-const grid_height = (WinHeight / BoxSize)/1.3;
+const grid_width = Math.floor((WinWidth / BoxSize) -2);
+const grid_height = Math.floor((WinHeight / BoxSize)/1.2);
 
 const grid_div = document.querySelector('.grid');
 let [Rand_start_x,Rand_start_y,Rand_end_x,Rand_end_y] = start_end_cell(); 
@@ -28,9 +28,9 @@ function create_grid() {
     
 
     for (let y = 0; y < grid_height; y++) {
-        for (let x = 2; x < grid_width; x++) {
+        for (let x = 0; x < grid_width; x++) {
             let child = document.createElement('div');
-            if(x == 2 || x >= grid_width - 1 || y == 0 || y >= grid_height - 1){
+            if(x == 0 || x >= grid_width - 1 || y == 0 || y >= grid_height - 1){
                 child.classList.add('wall_cell');
             }else if(x == Rand_end_x && y == Rand_end_y){
                 child.classList.add('end_cell');
@@ -117,7 +117,7 @@ function start_algorithm(){
                 }
             } else if (distances.bottomRight === right_move[collision]) {
                 let temp = document.getElementById(`x = ${head_grid_x + 1},y = ${head_grid_y - 1}`);
-                if (temp.classList.contains('wall_cell')) {
+                if (temp.classList.contains('wall_cell')|| temp.classList.contains('route_cell')) {
                     collision++;
                     travel_to_right_move(distances,right_move,collision);
                 }else{
@@ -127,7 +127,7 @@ function start_algorithm(){
                 }
             } else if (distances.bottom === right_move[collision]) {
                 let temp = document.getElementById(`x = ${head_grid_x},y = ${head_grid_y - 1}`);
-                if (temp.classList.contains('wall_cell') || temp.classList.contains('route_cell')) {
+                if (temp.classList.contains('wall_cell')|| temp.classList.contains('route_cell')) {
                     collision++;
                     travel_to_right_move(distances,right_move,collision);
                 }else{
@@ -185,8 +185,9 @@ function start_algorithm(){
                 
             }
         }else if (collision === 8) {
+            distance = 0;
             collision = 0;
-
+            alert('no path was Found !')
         }
     }
     
@@ -209,8 +210,9 @@ function start_algorithm(){
         let prev_x = head_grid_x;
         let prev_y = head_grid_y;
         travel_to_right_move(distances,right_move,collision);
-        
-        distance = calculate_distance(head_grid_x, head_grid_y);
+        if(distance !=0){
+            distance = calculate_distance(head_grid_x, head_grid_y);
+        }
 
         
         next_cell = document.getElementById(`x = ${head_grid_x},y = ${head_grid_y}`);
@@ -246,7 +248,6 @@ function start_algorithm(){
 
 function handle_inputs(){
     document.getElementById('BtnStart').onclick = function() {
-        console.log('Btn start here!');
         start_algorithm();
       };
     document.getElementById('Reset').onclick = function() {

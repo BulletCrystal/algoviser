@@ -91,6 +91,7 @@ for the grid  and empty cells
 .grid{
     position: relative;
     user-select: none;
+    margin: 0px 30px;
 }
 .empty_cell{
     background-color: white;
