@@ -4,6 +4,8 @@ const WinWidth = window.innerWidth;
 const WinHeight = window.innerHeight;
 const BoxSize = 30;
 const Time_step = 100;//time for each frame in (ms)
+let selected = '';
+
 
 const grid_width = Math.floor((WinWidth / BoxSize) -2);
 const grid_height = Math.floor((WinHeight / BoxSize)/1.2);
@@ -105,108 +107,72 @@ function start_algorithm(){
     function calculate_distance(x, y) {
         return Math.sqrt((x-Rand_end_x)**2 + (y-Rand_end_y)**2);
     }
-    function travel_to_right_move(distances,right_move,collision){
-        if(collision < 8){
-            if (distances.right === right_move[collision]) {
-                let temp = document.getElementById(`x = ${head_grid_x + 1},y = ${head_grid_y}`);
-                if (temp.classList.contains('wall_cell') || temp.classList.contains('route_cell')) {
-                    collision++;
-                    travel_to_right_move(distances,right_move,collision);
-                }else{
-                    head_grid_x++; // Right
-                }
-            } else if (distances.bottomRight === right_move[collision]) {
-                let temp = document.getElementById(`x = ${head_grid_x + 1},y = ${head_grid_y - 1}`);
-                if (temp.classList.contains('wall_cell')|| temp.classList.contains('route_cell')) {
-                    collision++;
-                    travel_to_right_move(distances,right_move,collision);
-                }else{
-                    head_grid_x++;
-                    head_grid_y--; // Bottom-Right
-                    
-                }
-            } else if (distances.bottom === right_move[collision]) {
-                let temp = document.getElementById(`x = ${head_grid_x},y = ${head_grid_y - 1}`);
-                if (temp.classList.contains('wall_cell')|| temp.classList.contains('route_cell')) {
-                    collision++;
-                    travel_to_right_move(distances,right_move,collision);
-                }else{
-                    head_grid_y--; // Bottom
-                    
-                }
-            } else if (distances.bottomLeft === right_move[collision]) {
-                let temp = document.getElementById(`x = ${head_grid_x - 1},y = ${head_grid_y - 1}`)
-                if (temp.classList.contains('wall_cell') || temp.classList.contains('route_cell')) {
-                    collision++;
-                    travel_to_right_move(distances,right_move,collision);
-                }else{
-                    head_grid_x--;
-                    head_grid_y--; // Bottom-Left
-                    
-                }
-            } else if (distances.left === right_move[collision]) {
-                let temp = document.getElementById(`x = ${head_grid_x - 1},y = ${head_grid_y}`);
-                if (temp.classList.contains('wall_cell') || temp.classList.contains('route_cell')) {
-                    collision++;
-                    travel_to_right_move(distances,right_move,collision);
-                }else{
-                    head_grid_x--; // Left
-                    
-                }
-            } else if (distances.topLeft === right_move[collision]) {
-                let temp = document.getElementById(`x = ${head_grid_x - 1},y = ${head_grid_y + 1}`);
-                if (temp.classList.contains('wall_cell') || temp.classList.contains('route_cell')) {
-                    collision++;
-                    travel_to_right_move(distances,right_move,collision);
-                }else{
-                    head_grid_x--;
-                    head_grid_y++; // Top-Left
-                    
-                }
-            } else if (distances.top === right_move[collision]) {
-                let temp = document.getElementById(`x = ${head_grid_x},y = ${head_grid_y + 1}`);
-                if (temp.classList.contains('wall_cell') || temp.classList.contains('route_cell')) {
-                    collision++;
-                    travel_to_right_move(distances,right_move,collision);
-                }else{
-                    head_grid_y++; // Top
-                    
-                }
-            }else if (distances.topRight === right_move[collision]) {
-                let temp = document.getElementById(`x = ${head_grid_x + 1},y = ${head_grid_y + 1}`);
-                if (temp.classList.contains('wall_cell') || temp.classList.contains('route_cell')) {
-                    collision++;
-                    travel_to_right_move(distances,right_move,collision);
-                }else{
-                    head_grid_y++; // Top-Right
-                    head_grid_x++;
-                    
-                }
-                
-            }
-        }else if (collision === 8) {
+    function travel_to_right_move(distances, right_move, collision = 0) {
+        if (collision >= 8) {
+            alert('No path was found!');
             distance = 0;
-            collision = 0;
-            alert('no path was Found !')
+            return;
         }
+    
+        const moves = [
+            { direction: 'Right', deltaX: 1, deltaY: 0, distance: distances.right },
+            { direction: 'Bottom', deltaX: 0, deltaY: 1, distance: distances.bottom },
+            { direction: 'Left', deltaX: -1, deltaY: 0, distance: distances.left },
+            { direction: 'Top', deltaX: 0, deltaY: -1, distance: distances.top },
+            { direction: 'Top-Right', deltaX: 1, deltaY: -1, distance: distances.topright },
+            { direction: 'Bottom-Left', deltaX: -1, deltaY: 1, distance: distances.bottomleft },
+            { direction: 'Top-Left', deltaX: -1, deltaY: -1, distance: distances.topleft },
+            { direction: 'Bottom-Right', deltaX: 1, deltaY: 1, distance: distances.bottomright },
+        ];
+    
+        for (let move of moves) {
+            if (move.distance === right_move[collision]) {
+                let newX = head_grid_x + move.deltaX;
+                let newY = head_grid_y + move.deltaY;
+                let temp = document.getElementById(`x = ${newX},y = ${newY}`);
+    
+                if (temp && (temp.classList.contains('wall_cell') || temp.classList.contains('route_cell'))) {
+                    collision++;
+                    continue;
+                }
+    
+
+                console.log(move.direction);
+                head_grid_x = newX;
+                head_grid_y = newY;
+                return;
+            }
+        }
+    
+
+        travel_to_right_move(distances, right_move, collision);
     }
     
     function handle_routes() {
         // Movement logic
-        let collision = 0; // initilised for smallest distance
+        let collision = 0; // initialized for smallest distance
         let distances = {
             right: calculate_distance(head_grid_x + 1, head_grid_y),
-            bottomRight: calculate_distance(head_grid_x + 1, head_grid_y - 1),
-            bottom: calculate_distance(head_grid_x, head_grid_y - 1),
-            bottomLeft: calculate_distance(head_grid_x - 1, head_grid_y - 1),
+
+            topright : calculate_distance(head_grid_x + 1, head_grid_y - 1),
+
+            bottom: calculate_distance(head_grid_x, head_grid_y + 1),
+
+            bottomleft : calculate_distance(head_grid_x - 1, head_grid_y + 1),
+
             left: calculate_distance(head_grid_x - 1, head_grid_y),
-            topLeft: calculate_distance(head_grid_x - 1, head_grid_y + 1),
-            top: calculate_distance(head_grid_x, head_grid_y + 1),
-            topRight: calculate_distance(head_grid_x + 1, head_grid_y + 1)
+
+            topleft : calculate_distance(head_grid_x - 1, head_grid_y - 1),
+
+            top: calculate_distance(head_grid_x, head_grid_y - 1),
+
+            bottomright : calculate_distance(head_grid_x + 1, head_grid_y + 1)
+
         };
         
         // Convert distances to an array and sort
         let right_move = Object.values(distances).sort((a, b) => a - b);
+        
         let prev_x = head_grid_x;
         let prev_y = head_grid_y;
         travel_to_right_move(distances,right_move,collision);
@@ -214,7 +180,7 @@ function start_algorithm(){
             distance = calculate_distance(head_grid_x, head_grid_y);
         }
 
-        
+        // Animation for previous blocks
         next_cell = document.getElementById(`x = ${head_grid_x},y = ${head_grid_y}`);
         prev_cell = document.getElementById(`x = ${prev_x},y = ${prev_y}`);
         // Update blocks traveled
@@ -245,10 +211,41 @@ function start_algorithm(){
     handle_routes();
 }
 
+// Function to run selected algorithm
+function run(selected) {
+    if (selected == 'myCustom') {
+        start_algorithm();
+    }else{
+        alert("algorithm not available yet :(");
+    }
+}
 
 function handle_inputs(){
+    const options = document.querySelectorAll('.option');
+    const opts = document.querySelector('.options');
+    const algos = document.getElementById('Algos');
+    
+    algos.onclick = function (event) {
+        event.stopPropagation(); // it works d'ont TOUCH it
+        opts.style.display = opts.style.display === 'block' ? 'none' : 'block';
+    }
+    
+    document.addEventListener('click', function () {
+        opts.style.display = 'none';
+    });
+    
+    for (let option = 0; option < options.length; option++) {
+        const element = options[option];
+        element.onclick = function (){
+            selected = element.id;
+        }
+    }
     document.getElementById('BtnStart').onclick = function() {
-        start_algorithm();
+        if (selected) {
+            run(selected);
+        }else{
+            alert("select an algorithm first !");
+        }
       };
     document.getElementById('Reset').onclick = function() {
         location.reload();

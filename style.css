@@ -43,7 +43,7 @@ body{
     background-color: green;
     box-shadow: 0 8px 16px rgba(0,0,0,0.3);
     z-index: 2;
-    padding: 10px 0px;
+    margin: 15px 0px;
 }
 
 #Algos:hover .options{
@@ -52,11 +52,13 @@ body{
 #Algos .option{
     border: 0.5px solid transparent;
     padding: 5px 0px;
+    margin: 5px 0px;
 }
 #Algos .option:hover{
     border: 0.5px solid rgba(255,255,255,0.3);
     background-color: darkgreen;
 }
+
 
 /* info */
 
